@@ -1,46 +1,27 @@
-import requests
+from util import generate_headers, generate_proxies
+import crawlers.article_page as article
+import crawlers.author_page as author
+from queue import Queue
 
-FILENAME = "valid_proxy_list.txt"
+headers = generate_headers()
+proxies = generate_proxies()
 
-with open(FILENAME, "r") as file:
-    proxies = file.read().split("\n")[:-1]
+users = ["Kv9AbjMAAAAJ"]
 
-sites_to_check = ["https://www.amazon.com/?tag=amazusnavi-20&hvadid=675149237887&hvpos=&hvnetw=g&hvrand=16573818752733055329&hvpone=&hvptwo=&hvqmt=e&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9022196&hvtargid=kwd-10573980&ref=pd_sl_7j18redljs_e&hydadcr=28883_14649097&gad_source=1"]
+THREADS = 6
 
-counter = 0
-for site in sites_to_check:
+if __name__ == "__main__":
 
-    flag = True
+    q = Queue()
 
-    while flag and len(proxies):
-
-        try:
-            
-            res = requests.get(site, 
-                            proxies={
-                                    "http": "101.255.134.100:8080",
-                                    "https": "101.255.134.100:8080"
-                                },
-                                timeout=5
-                    )
-            
-            print(res.status_code)
-
-            exit()
-
-            if res.status_code == 200:
-                flag = False
-            
-            counter += 1
+    for user in users:
         
-        except:
+        data = author.scrape(user, headers, proxies)
+        
+        for citation_for_view in data:
+            q.put([user, citation_for_view])
 
-            print(res.status_code)
+    q.put(None)
 
-            exit()
+    article.scrape(q, headers, proxies)
 
-            print("failed")
-
-            proxies.pop(counter)    
-
-print(proxies)       

@@ -2,9 +2,9 @@ from queue import Queue
 import threading 
 import requests
 
-INPUT = "proxy_list.txt"
-OUTPUT = "valid_proxy_list.txt"
-SITE_TO_TEST = "https://scholar.google.com/citations?user=Kv9AbjMAAAAJ&hl=en&oi=sra"
+INPUT = "proxy_list/proxy_list.txt"
+OUTPUT = "proxy_list/valid_proxy_list.txt"
+SITE_TO_TEST = "https://scholar.google.com"
 THREADS = 6
 
 CWHITE  = '\33[37m'
@@ -18,8 +18,6 @@ with open(INPUT, "r") as file:
     proxies = file.read().split("\n")
     for proxy in proxies[:-1]:
         q.put(proxy)
-
-q.put(None)
 
 def check_proxy(i):
 
